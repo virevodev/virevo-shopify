@@ -29,19 +29,29 @@ export async function createVirevoPayment({ amountCents, currency, reference, re
 
 /**
  * Vérifie la signature d'un webhook Virevo : en-tête `Virevo-Signature`
- * « t=<unix>,v1=<hmac> », HMAC-SHA256 de "<t>.<corps_brut>", tolérance 5 min.
+ * « t=<unix>,v1=<hmac>[,v1=<hmac>] », HMAC-SHA256 de "<t>.<corps_brut>",
+ * tolérance 5 min. Plusieurs v1 possibles pendant une rotation de secret
+ * (ancien + nouveau) : on accepte si l'un d'eux correspond.
  */
 export function verifyVirevoWebhook(header, rawBody, nowSec = Math.floor(Date.now() / 1000)) {
   const secret = config.virevo.webhookSecret;
   if (!secret || !header) return false;
-  const parts = Object.fromEntries(
-    header.split(",").map((kv) => kv.split("=").map((s) => s.trim())),
-  );
-  const t = Number(parts.t);
-  if (!Number.isFinite(t) || !parts.v1) return false;
+  let t = NaN;
+  const sigs = [];
+  for (const kv of header.split(",")) {
+    const i = kv.indexOf("=");
+    if (i < 0) continue;
+    const k = kv.slice(0, i).trim();
+    const v = kv.slice(i + 1).trim();
+    if (k === "t") t = Number(v);
+    else if (k === "v1" && v) sigs.push(v);
+  }
+  if (!Number.isFinite(t) || sigs.length === 0) return false;
   if (Math.abs(nowSec - t) > 300) return false;
   const expected = createHmac("sha256", secret).update(`${t}.${rawBody}`).digest("hex");
   const a = Buffer.from(expected);
-  const b = Buffer.from(parts.v1);
-  return a.length === b.length && timingSafeEqual(a, b);
+  return sigs.some((v1) => {
+    const b = Buffer.from(v1);
+    return a.length === b.length && timingSafeEqual(a, b);
+  });
 }
