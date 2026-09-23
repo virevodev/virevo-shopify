@@ -62,7 +62,7 @@ npm run dev            # GET /health pour vérifier
 ## Références
 - Shopify — Payments Apps API : https://shopify.dev/docs/apps/build/payments
 - Exigences : https://shopify.dev/docs/apps/build/payments/requirements
-- Guide développeur Virevo : https://virevo.fr/developpeurs.html
+- Guide développeur Virevo : https://virevo.fr/developpeurs
 
 ## Licence
 GPLv2 or later.
