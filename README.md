@@ -1,3 +1,7 @@
+> **Projet arrêté.** Virevo a cessé son activité en novembre 2026. Ce module ne fonctionne plus : le service qu'il appelle est fermé. Désactivez-le et désinstallez-le de votre boutique. Le code reste consultable à titre d'archive.
+>
+> **Discontinued.** Virevo shut down in November 2026. This module no longer works because the service it relies on is closed. Please deactivate and uninstall it. The code remains available as an archive.
+
 # Virevo for Shopify — app de paiement *offsite* (squelette)
 
 > ⚠️ **Lire d'abord.** Sur Shopify, un moyen de paiement tiers **n'est pas un
